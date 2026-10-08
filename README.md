@@ -42,7 +42,7 @@ Current settings:
 | Live stream (`streamUrl`) | *empty — add on the day* |
 | RSVPs & gift notes go to (WhatsApp) | Glory +234 903 443 5770 · Precious +234 811 285 3404 |
 | Wedding-day help & directions | +234 806 545 2494, +234 703 105 1140 |
-| Wishlist | Power Blender ₦200,000 · Mini Solar Setup ₦1,000,000 · Kitchen support (any amount) · New home support (any amount) · Any amount |
+| Wishlist | Mini Solar Setup ₦1,000,000 · Washing Machine ₦450,000 · Water Dispenser ₦250,000 · Power Blender ₦200,000 · Gas Cooker/Oven ₦200,000 · Microwave ₦150,000 · Air Fryer ₦80,000 · Rice Cooker ₦40,000 · Electric Kettle ₦40,000 · Kitchen support (any) · New home support (any) · Any amount |
 | Account 1 | Opay · 9034435770 · Ngene Glory Uche |
 | Account 2 | Access Bank · 1596611810 · Ngene Glory Uche |
 | Account 3 | GTBank (Naira) · 0208897487 · Chikezie Precious Ebubechukwu |
@@ -73,3 +73,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-08** — Venue corrected to *opposite* The Federal Polytechnic, Bida. Directions button now opens the exact Google Maps pin: https://maps.app.goo.gl/5nxTS4azkkPo9rVM6
 - **2026-10-08** — Added Kitchen support and New home support to the wishlist (any amount). Wishlist now shows two per row with the general "Any amount" card full width.
 - **2026-10-08** — Gift form now asks "Online with Paystack" or "Bank transfer". Online opens Paystack with the chosen amount and the guest's name already filled in (Paystack `amount`, `first_name`, `last_name` link options). Added GTBank Naira and USD accounts for Precious.
+- **2026-10-08** — Added 7 appliances to the wishlist with rounded mid-range Nigerian prices (Jumia/Jiji/Zit, Oct 2026): Washing Machine ₦450k, Water Dispenser ₦250k, Gas Cooker/Oven ₦200k, Microwave ₦150k, Air Fryer ₦80k, Rice Cooker ₦40k, Electric Kettle ₦40k. Wishlist sorted from highest to lowest price.

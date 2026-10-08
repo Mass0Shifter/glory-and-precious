@@ -555,8 +555,15 @@ const CONFIG = {
   ],
   quickAmounts: [2000, 5000, 10000, 20000, 50000, 100000],
   wishes: [                                   // price 0 = any amount
-    { title:"Power Blender", text:"A strong blender for smoothies, pepper and everything in our new kitchen.", price:200000, icon:"blender" },
     { title:"Mini Solar Setup", text:"Steady light and power for our new home, rain or shine.", price:1000000, icon:"solar" },
+    { title:"Washing Machine", text:"A 7kg automatic washer to give us our weekends back.", price:450000, icon:"washer" },
+    { title:"Water Dispenser", text:"A standing hot and cold dispenser for cool water and quick tea.", price:250000, icon:"dispenser" },
+    { title:"Power Blender", text:"A strong blender for smoothies, pepper and everything in our new kitchen.", price:200000, icon:"blender" },
+    { title:"Gas Cooker / Oven", text:"A four-burner standing cooker with oven for Sunday rice and baking.", price:200000, icon:"cooker" },
+    { title:"Microwave", text:"For warming leftovers and quick meals on busy days.", price:150000, icon:"microwave" },
+    { title:"Air Fryer", text:"Crispy plantain and chicken with less oil.", price:80000, icon:"airfryer" },
+    { title:"Rice Cooker", text:"Perfect rice every time, without watching the pot.", price:40000, icon:"ricecooker" },
+    { title:"Electric Kettle", text:"Hot water in minutes for tea, pap and noodles.", price:40000, icon:"kettle" },
     { title:"Kitchen support", text:"Pots, utensils and everything we need to cook together in our new kitchen.", price:0, icon:"pot" },
     { title:"New home support", text:"Furniture and finishing touches to make our first home warm and ready.", price:0, icon:"home" },
     { title:"Any amount", text:"Whatever is on your heart. Every naira is appreciated.", price:0, icon:"gift", general:true }
@@ -614,6 +621,13 @@ const ICONS = {
   heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
   blender:'<path d="M7 3h10l-1.6 10H8.6z"/><path d="M8.6 13h6.8l1.1 4H7.5z"/><rect x="6" y="17" width="12" height="4" rx="1"/><path d="M10 7h4"/><circle cx="12" cy="19" r=".6"/>',
   solar:'<path d="M3 16l3-8h12l3 8z"/><path d="M4.6 12h14.8M10 8l-1 8M14 8l1 8"/><path d="M12 16v4M9 20h6"/><circle cx="19.5" cy="3.5" r="1.5"/>',
+  washer:'<rect x="4" y="2.5" width="16" height="19" rx="1.5"/><path d="M4 6.5h16"/><circle cx="12" cy="14" r="4.5"/><path d="M9.5 14.5c1-.8 2-.8 3 0s2 .8 3 0"/><circle cx="7" cy="4.5" r=".5"/><path d="M14 4.5h3"/>',
+  dispenser:'<path d="M9 2h6l1 5H8z"/><rect x="6" y="7" width="12" height="15" rx="1"/><path d="M10 12v2M14 12v2M8 16h8M6 19h12"/>',
+  cooker:'<rect x="4" y="7" width="16" height="14" rx="1"/><path d="M4 10.5h16"/><rect x="7" y="13" width="10" height="5.5" rx=".5"/><circle cx="8" cy="5" r="1.6"/><circle cx="16" cy="5" r="1.6"/><path d="M7.5 8.7h.01M10.5 8.7h.01M13.5 8.7h.01M16.5 8.7h.01"/>',
+  microwave:'<rect x="2.5" y="5" width="19" height="14" rx="1.5"/><rect x="5" y="7.5" width="10" height="9" rx=".5"/><path d="M18.3 8v1M18.3 11v1M18.3 14v2"/><path d="M5 21h2M17 21h2"/>',
+  airfryer:'<path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><circle cx="12" cy="8" r="2.2"/><rect x="7.5" y="13" width="9" height="5" rx="1"/><path d="M10.5 15.5h3"/>',
+  ricecooker:'<path d="M5 10h14v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M4 10c0-3.3 3.6-5 8-5s8 1.7 8 5"/><path d="M11 4.5h2"/><circle cx="12" cy="15.5" r="1.4"/>',
+  kettle:'<path d="M6 9h10l1.5 11a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1z"/><path d="M8 9l1-4h4l1 4"/><path d="M16.5 11c2.5 0 3.5 1.5 3.5 3.5S19 18 17.2 18"/><path d="M6 9 3 6.5"/>',
   gift:'<rect x="3" y="9" width="18" height="12"/><path d="M3 13h18M12 9v12M12 9c-2-4-6-4-6-1s6 1 6 1 6 2 6-1-4-3-6 1"/>'
 };
 const naira = n => "₦" + Number(n).toLocaleString("en-NG");
