@@ -1,5 +1,7 @@
 # Glory & Precious — Wedding Website
 
+**Live site: https://glory-and-precious.vercel.app/**
+
 The wedding website for the Holy Matrimony of **Glory Uchechukwu Ngene & Precious Ebubechukwu Chikezie**,
 Sunday 25 October 2026, 5:00 pm, Treasure Spring Auditorium, The Federal Polytechnic, Bida, Niger State.
 
@@ -65,3 +67,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-08** — Site built: e-invite, events, livestream section, WhatsApp RSVP, Paystack + bank gifts, FAQ. Real photos added. Prepared for Netlify with Netlify Forms.
 - **2026-10-08** — Pushed to GitHub for Netlify. Wishlist replaced with real items (Power Blender ₦200,000, Mini Solar Setup ₦1,000,000, Any amount); each can be gifted in full or contributed to. RSVPs & gift notes now go to Glory and Precious on WhatsApp; the earlier two numbers are now wedding-day/directions contacts.
 - **2026-10-08** — Switched hosting from Netlify to Vercel (removed Netlify Forms and netlify.toml, added vercel.json).
+- **2026-10-08** — Live at https://glory-and-precious.vercel.app/. Added link-preview tags so WhatsApp shows the photo and title.
