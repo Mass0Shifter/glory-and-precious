@@ -10,8 +10,8 @@ Colours: navy blue, champagne gold and white.
 - **E-invite**: families, names, date, venue and a live countdown to the Holy Matrimony.
 - **For your prayers**: Court wedding (Tue 20 Oct, Abuja) and Traditional wedding (Sat 24 Oct, Abuja) are shown as information only, not invitations.
 - **Watch live**: a section that shows a "Join the live stream" button once a stream link is added.
-- **RSVP**: guests choose "In Bida", "Watching online" or "Can't make it", then send their reply on WhatsApp.
-- **Gifts**: a "Gift online now" button (Paystack), two bank accounts with copy buttons, a wishlist, and a thank-you note form sent on WhatsApp.
+- **RSVP**: guests choose "In Bida", "Watching online" or "Can't make it", then send their reply on WhatsApp to Glory or Precious.
+- **Gifts**: a "Gift online now" button (Paystack), two bank accounts with copy buttons, a wishlist (each item can be gifted in full or contributed to), and a thank-you note form sent on WhatsApp to Glory or Precious.
 - No mention of catering anywhere on the site.
 
 ## Files
@@ -38,7 +38,9 @@ Current settings:
 |---|---|
 | Paystack link (`payLink`) | https://paystack.shop/pay/kabodsquare (**was still in test mode on 8 Oct 2026 — must be switched to Live**) |
 | Live stream (`streamUrl`) | *empty — add on the day* |
-| RSVP / WhatsApp numbers | +234 806 545 2494, +234 703 105 1140 |
+| RSVPs & gift notes go to (WhatsApp) | Glory +234 903 443 5770 · Precious +234 811 285 3404 |
+| Wedding-day help & directions | +234 806 545 2494, +234 703 105 1140 |
+| Wishlist | Power Blender ₦200,000 · Mini Solar Setup ₦1,000,000 · Any amount (more items to come) |
 | Account 1 | Opay · 9034435770 · Ngene Glory Uche |
 | Account 2 | Access Bank · 1596611810 · Ngene Glory Uche |
 | RSVP deadline | 18 October 2026 |
@@ -58,6 +60,12 @@ Besides WhatsApp, every RSVP and gift note is also saved on Netlify:
 3. Leave the build command **empty**. Publish directory: `.` (a single dot).
 4. Click **Deploy**. Every change pushed to GitHub goes live automatically.
 
+## For Claude (or a developer) making changes
+
+The editable source is in `_build/`: `wedding.src.html` (the page, with the `CONFIG` block) and `build.py`.
+Run `python3 _build/build.py` from the folder *above* this repo with the photos beside it, or simply edit `index.html` directly — both work.
+
 ## Change log
 
 - **2026-10-08** — Site built: e-invite, events, livestream section, WhatsApp RSVP, Paystack + bank gifts, FAQ. Real photos added. Prepared for Netlify with Netlify Forms.
+- **2026-10-08** — Pushed to GitHub for Netlify. Wishlist replaced with real items (Power Blender ₦200,000, Mini Solar Setup ₦1,000,000, Any amount); each can be gifted in full or contributed to. RSVPs & gift notes now go to Glory and Precious on WhatsApp; the earlier two numbers are now wedding-day/directions contacts.

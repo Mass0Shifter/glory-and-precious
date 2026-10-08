@@ -1,16 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Glory & Precious 2026</title>
-<meta name="description" content="You are invited to the Holy Matrimony of Glory & Precious, Sunday 25 October 2026, 5:00 pm, Bida, Niger State.">
-<meta property="og:title" content="Glory & Precious · 25 October 2026">
-<meta property="og:description" content="You are invited to our Holy Matrimony in Bida. RSVP, watch live and send a gift.">
-<meta property="og:image" content="images/hero.jpg">
-<meta property="og:type" content="website">
-<style>[hidden]{display:none!important}body{margin:0}</style>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap">
 <style>
@@ -273,8 +261,6 @@ footer small{color:var(--mist);font-size:13px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.names{background-position:50% 0}}
 </style>
 
-</head>
-<body>
 <a class="livebar" id="liveBar" href="#live" hidden><span class="dot"></span>We are live now. Join the stream</a>
 <nav aria-label="Sections">
   <div class="wrap">
@@ -293,7 +279,7 @@ footer small{color:var(--mist);font-size:13px}
 <header class="hero" id="invite">
   <div class="wrap">
     <div class="arch">
-      <div class="frame"><img src="images/hero.jpg" alt="Glory and Precious, he in a navy embellished suit"></div>
+      <div class="frame"><img src="{{HERO}}" alt="Glory and Precious, he in a navy embellished suit"></div>
       <div class="tag" data-c="hashtag">#GloryAndPrecious26</div>
     </div>
     <div class="invite">
@@ -345,9 +331,9 @@ footer small{color:var(--mist);font-size:13px}
         </div>
       </div>
       <div class="gallery">
-        <div class="ph tall"><img src="images/trad_full.jpg" alt="Glory and Precious in matching red traditional attire with coral beads"></div>
-        <div class="ph sq"><img src="images/trad_sq.jpg" alt="Glory and Precious smiling in traditional attire" style="object-position:50% 20%"></div>
-        <div class="ph sq"><img src="images/couple.jpg" alt="Glory and Precious at an evening event" style="object-position:50% 30%"></div>
+        <div class="ph tall"><img src="{{TRADF}}" alt="Glory and Precious in matching red traditional attire with coral beads"></div>
+        <div class="ph sq"><img src="{{TRADS}}" alt="Glory and Precious smiling in traditional attire" style="object-position:50% 20%"></div>
+        <div class="ph sq"><img src="{{COUPLE}}" alt="Glory and Precious at an evening event" style="object-position:50% 30%"></div>
       </div>
     </div>
   </div>
@@ -515,15 +501,6 @@ footer small{color:var(--mist);font-size:13px}
   <small>Share your photos with our hashtag on the day.</small>
 </footer>
 
-
-<!-- Netlify Forms: these hidden forms let Netlify save every RSVP and gift note (see README) -->
-<form name="rsvp" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="name"><input name="phone"><input name="attending"><input name="guests"><textarea name="note"></textarea>
-</form>
-<form name="gift" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="name"><input name="amount"><input name="account"><input name="towards"><textarea name="message"></textarea>
-</form>
-
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
@@ -670,11 +647,6 @@ $("acctList").addEventListener("click", e => {
   try { navigator.clipboard.writeText(txt).then(()=>toast(CONFIG.accounts[i].bank + " number copied"), fallback); } catch(err){ fallback(); }
 });
 
-/* ---------- save a copy to Netlify Forms (works only on the Netlify site) ---------- */
-function saveToNetlify(formName, fields){
-  try { fetch("/", {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:new URLSearchParams({"form-name": formName, ...fields}).toString()}).catch(()=>{}); } catch(e) {}
-}
-
 /* ---------- RSVP ---------- */
 const waButtons = text => CONFIG.couple.map((p,i)=>`<a class="btn ${i?'btn-line':'btn-gold'}" href="https://wa.me/${p.wa}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">Send to ${esc(p.who)}</a>`).join("");
 $("rPhones").textContent = CONFIG.couple.map(p=>`${p.who} on ${p.display}`).join(" or ");
@@ -695,7 +667,6 @@ $("rsvpForm").addEventListener("submit", e => {
        : `\nAttending: Sorry, I can't make it`;
   if ($("rNote").value.trim()) msg += `\n\nNote: ${$("rNote").value.trim()}`;
   $("rWaBtns").innerHTML = waButtons(msg);
-  saveToNetlify("rsvp", {name, phone:$("rPhone").value.trim(), attending: mode==="yes"?"In Bida":mode==="online"?"Watching online":"Can't make it", guests: mode==="yes"?$("rGuests").value:"0", note:$("rNote").value.trim()});
   $("rDoneTitle").textContent = mode === "yes" ? "We can't wait to see you" : mode === "online" ? "See you on the stream" : "You'll be missed";
   $("rDone").hidden = false;
   $("rDone").scrollIntoView({behavior:"smooth", block:"center"});
@@ -714,11 +685,7 @@ $("giftForm").addEventListener("submit", e => {
   msg += `\nTowards: ${$("gFor").value}`;
   if ($("gMsg").value.trim()) msg += `\n\nMessage: ${$("gMsg").value.trim()}`;
   $("gWaBtns").innerHTML = waButtons(msg);
-  saveToNetlify("gift", {name, amount: amt>0?String(amt):"", account:$("gAcct").value, towards:$("gFor").value, message:$("gMsg").value.trim()});
   $("gDone").hidden = false;
   $("gDone").scrollIntoView({behavior:"smooth", block:"center"});
 });
 </script>
-
-</body>
-</html>
