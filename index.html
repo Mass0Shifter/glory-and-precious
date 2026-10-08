@@ -515,15 +515,6 @@ footer small{color:var(--mist);font-size:13px}
   <small>Share your photos with our hashtag on the day.</small>
 </footer>
 
-
-<!-- Netlify Forms: these hidden forms let Netlify save every RSVP and gift note (see README) -->
-<form name="rsvp" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="name"><input name="phone"><input name="attending"><input name="guests"><textarea name="note"></textarea>
-</form>
-<form name="gift" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="name"><input name="amount"><input name="account"><input name="towards"><textarea name="message"></textarea>
-</form>
-
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
@@ -670,11 +661,6 @@ $("acctList").addEventListener("click", e => {
   try { navigator.clipboard.writeText(txt).then(()=>toast(CONFIG.accounts[i].bank + " number copied"), fallback); } catch(err){ fallback(); }
 });
 
-/* ---------- save a copy to Netlify Forms (works only on the Netlify site) ---------- */
-function saveToNetlify(formName, fields){
-  try { fetch("/", {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:new URLSearchParams({"form-name": formName, ...fields}).toString()}).catch(()=>{}); } catch(e) {}
-}
-
 /* ---------- RSVP ---------- */
 const waButtons = text => CONFIG.couple.map((p,i)=>`<a class="btn ${i?'btn-line':'btn-gold'}" href="https://wa.me/${p.wa}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">Send to ${esc(p.who)}</a>`).join("");
 $("rPhones").textContent = CONFIG.couple.map(p=>`${p.who} on ${p.display}`).join(" or ");
@@ -695,7 +681,6 @@ $("rsvpForm").addEventListener("submit", e => {
        : `\nAttending: Sorry, I can't make it`;
   if ($("rNote").value.trim()) msg += `\n\nNote: ${$("rNote").value.trim()}`;
   $("rWaBtns").innerHTML = waButtons(msg);
-  saveToNetlify("rsvp", {name, phone:$("rPhone").value.trim(), attending: mode==="yes"?"In Bida":mode==="online"?"Watching online":"Can't make it", guests: mode==="yes"?$("rGuests").value:"0", note:$("rNote").value.trim()});
   $("rDoneTitle").textContent = mode === "yes" ? "We can't wait to see you" : mode === "online" ? "See you on the stream" : "You'll be missed";
   $("rDone").hidden = false;
   $("rDone").scrollIntoView({behavior:"smooth", block:"center"});
@@ -714,7 +699,6 @@ $("giftForm").addEventListener("submit", e => {
   msg += `\nTowards: ${$("gFor").value}`;
   if ($("gMsg").value.trim()) msg += `\n\nMessage: ${$("gMsg").value.trim()}`;
   $("gWaBtns").innerHTML = waButtons(msg);
-  saveToNetlify("gift", {name, amount: amt>0?String(amt):"", account:$("gAcct").value, towards:$("gFor").value, message:$("gMsg").value.trim()});
   $("gDone").hidden = false;
   $("gDone").scrollIntoView({behavior:"smooth", block:"center"});
 });

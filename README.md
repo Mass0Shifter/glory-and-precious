@@ -23,9 +23,9 @@ Colours: navy blue, champagne gold and white.
 | `images/trad_full.jpg` | Tall gallery photo (red traditional, full length) |
 | `images/trad_sq.jpg` | Gallery photo (red traditional, close) |
 | `images/couple.jpg` | Gallery photo (evening event) |
-| `netlify.toml` | Settings for Netlify (no build needed) |
+| `vercel.json` | Settings for Vercel (no build needed) |
 
-To swap a photo, upload a new picture to the `images` folder on GitHub with **exactly the same file name**. Netlify updates the site automatically.
+To swap a photo, upload a new picture to the `images` folder on GitHub with **exactly the same file name**. Vercel updates the site automatically.
 
 ## Changing details (names, links, numbers, accounts)
 
@@ -46,19 +46,14 @@ Current settings:
 | RSVP deadline | 18 October 2026 |
 | Hashtag | #GloryAndPrecious26 (placeholder, not confirmed) |
 
-## Seeing RSVPs and gift notes on Netlify
+## Hosting on Vercel (one-time setup)
 
-Besides WhatsApp, every RSVP and gift note is also saved on Netlify:
-1. In Netlify, open the site → **Forms**. If asked, click **Enable form detection**, then redeploy once (Deploys → Trigger deploy).
-2. Two forms appear: **rsvp** and **gift**. Each submission shows the guest's details.
-3. To get an email for each one: Forms → **Form notifications** → Add notification → Email.
-
-## Hosting on Netlify (one-time setup)
-
-1. Netlify → **Add new project → Import an existing project → GitHub**.
-2. Pick the `glory-and-precious` repository.
-3. Leave the build command **empty**. Publish directory: `.` (a single dot).
+1. Vercel → **Add New… → Project**.
+2. Import the `glory-and-precious` GitHub repository.
+3. Framework preset: **Other**. Leave the build command and output directory **empty**.
 4. Click **Deploy**. Every change pushed to GitHub goes live automatically.
+
+RSVPs and gift notes arrive on WhatsApp (Glory and Precious). Online gifts are recorded in the Paystack dashboard.
 
 ## For Claude (or a developer) making changes
 
@@ -69,3 +64,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 
 - **2026-10-08** — Site built: e-invite, events, livestream section, WhatsApp RSVP, Paystack + bank gifts, FAQ. Real photos added. Prepared for Netlify with Netlify Forms.
 - **2026-10-08** — Pushed to GitHub for Netlify. Wishlist replaced with real items (Power Blender ₦200,000, Mini Solar Setup ₦1,000,000, Any amount); each can be gifted in full or contributed to. RSVPs & gift notes now go to Glory and Precious on WhatsApp; the earlier two numbers are now wedding-day/directions contacts.
+- **2026-10-08** — Switched hosting from Netlify to Vercel (removed Netlify Forms and netlify.toml, added vercel.json).
