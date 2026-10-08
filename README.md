@@ -42,7 +42,7 @@ Current settings:
 | Live stream (`streamUrl`) | *empty — add on the day* |
 | RSVPs & gift notes go to (WhatsApp) | Glory +234 903 443 5770 · Precious +234 811 285 3404 |
 | Wedding-day help & directions | +234 806 545 2494, +234 703 105 1140 |
-| Wishlist | Power Blender ₦200,000 · Mini Solar Setup ₦1,000,000 · Any amount (more items to come) |
+| Wishlist | Power Blender ₦200,000 · Mini Solar Setup ₦1,000,000 · Kitchen support (any amount) · New home support (any amount) · Any amount |
 | Account 1 | Opay · 9034435770 · Ngene Glory Uche |
 | Account 2 | Access Bank · 1596611810 · Ngene Glory Uche |
 | RSVP deadline | 18 October 2026 |
@@ -69,3 +69,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-08** — Switched hosting from Netlify to Vercel (removed Netlify Forms and netlify.toml, added vercel.json).
 - **2026-10-08** — Live at https://glory-and-precious.vercel.app/. Added link-preview tags so WhatsApp shows the photo and title.
 - **2026-10-08** — Venue corrected to *opposite* The Federal Polytechnic, Bida. Directions button now opens the exact Google Maps pin: https://maps.app.goo.gl/5nxTS4azkkPo9rVM6
+- **2026-10-08** — Added Kitchen support and New home support to the wishlist (any amount). Wishlist now shows two per row with the general "Any amount" card full width.

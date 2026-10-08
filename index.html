@@ -202,7 +202,8 @@ legend{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:upperc
 .wish-intro{display:grid;gap:12px;justify-items:center;text-align:center;margin-bottom:28px}
 .wish-intro h3{font-size:30px}
 .wish-intro p{color:var(--mist);max-width:56ch}
-.wishes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.wishes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:900px;margin-inline:auto}
+.wish.wide{grid-column:1/-1}
 .wish{border:1px solid rgba(205,174,116,.35);padding:24px;display:grid;gap:10px;grid-template-rows:auto auto 1fr auto;background:rgba(21,38,75,.6)}
 .wish .ico{width:40px;height:40px;color:var(--gold)}
 .wish h4{margin:0;font-family:var(--f-display);font-weight:400;font-size:21px}
@@ -215,7 +216,7 @@ legend{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:upperc
 .me-help a{color:var(--gold-soft);white-space:nowrap}
 .wish button{font:inherit;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;background:transparent;border:0;color:var(--gold);cursor:pointer;padding:6px 0}
 .wish button:hover{color:var(--gold-soft);text-decoration:underline;text-underline-offset:4px}
-@media (max-width:900px){.gift-top{grid-template-columns:1fr}.wishes{grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.gift-top{grid-template-columns:1fr}}
 @media (max-width:560px){.wishes{grid-template-columns:1fr}.acct .no{font-size:24px}}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:56px auto 36px;max-width:900px;text-align:center}
 .steps div{display:grid;gap:6px;justify-items:center}
@@ -559,7 +560,9 @@ const CONFIG = {
   wishes: [                                   // price 0 = any amount
     { title:"Power Blender", text:"A strong blender for smoothies, pepper and everything in our new kitchen.", price:200000, icon:"blender" },
     { title:"Mini Solar Setup", text:"Steady light and power for our new home, rain or shine.", price:1000000, icon:"solar" },
-    { title:"Any amount", text:"Whatever is on your heart. Every naira is appreciated.", price:0, icon:"gift" }
+    { title:"Kitchen support", text:"Pots, utensils and everything we need to cook together in our new kitchen.", price:0, icon:"pot" },
+    { title:"New home support", text:"Furniture and finishing touches to make our first home warm and ready.", price:0, icon:"home" },
+    { title:"Any amount", text:"Whatever is on your heart. Every naira is appreciated.", price:0, icon:"gift", general:true }
   ],
   faq: [
     ["Which events am I invited to?", "Our invitation is to the Holy Matrimony in Bida on Sunday 25 October. The court and traditional weddings in Abuja are family ceremonies; we share them so you can keep us in your prayers."],
@@ -618,12 +621,12 @@ const ICONS = {
 };
 const naira = n => "₦" + Number(n).toLocaleString("en-NG");
 $("wishList").innerHTML = CONFIG.wishes.map((w,i)=>`
-  <article class="wish">
+  <article class="wish${w.general ? " wide" : ""}">
     <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[w.icon]||ICONS.gift}</svg>
     <h4>${esc(w.title)}</h4>
     <p>${esc(w.text)}</p>
-    <div class="row"><span class="amt">${w.price ? naira(w.price) : "You choose"}</span>
-      <span class="wbtns">${w.price ? `<button type="button" data-w="${i}" data-full="1">Gift it all</button>` : ""}<button type="button" data-w="${i}">${w.price ? "Contribute" : "Give"}</button></span></div>
+    <div class="row"><span class="amt">${w.price ? naira(w.price) : w.general ? "You choose" : "Any amount"}</span>
+      <span class="wbtns">${w.price ? `<button type="button" data-w="${i}" data-full="1">Gift it all</button>` : ""}<button type="button" data-w="${i}">${w.general ? "Give" : "Contribute"}</button></span></div>
     ${w.price ? `<p class="part">Contribute any amount towards it</p>` : ""}
   </article>`).join("");
 $("amtChips").innerHTML = CONFIG.quickAmounts.map(n=>`<button type="button" class="chip" data-n="${n}">${naira(n)}</button>`).join("");
