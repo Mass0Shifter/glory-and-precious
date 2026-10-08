@@ -256,6 +256,9 @@ legend{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:upperc
 .hint-dark a{color:var(--gold-soft)}
 .livebar{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--gold);color:var(--navy);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 16px}
 /* amount chips */
+.formcard .note-btn{background:transparent;color:var(--navy);border-color:var(--navy)}
+.formcard .note-btn:hover{background:var(--ivory-2)}
+.gift-actions{justify-content:flex-start}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font:inherit;font-size:15px;font-variant-numeric:tabular-nums;background:#fff;border:1px solid #DCCFB5;color:var(--ink);padding:8px 14px;cursor:pointer}
 .chip:hover{border-color:var(--gold-deep)}
@@ -461,7 +464,7 @@ footer small{color:var(--mist);font-size:13px}
         <p>Pay securely with your card, bank transfer or USSD on Paystack. Any amount, from anywhere in the world.</p>
         <div class="methods" aria-hidden="true"><span>Card</span><span>Transfer</span><span>USSD</span><span>Bank app</span></div>
         <a class="btn btn-pay" id="payBtn" href="#" target="_blank" rel="noopener">Gift online now</a>
-        <p class="small">Opens a secure Paystack page in a new tab.</p>
+        <p class="small">Opens a secure Paystack page in a new tab. Or <a href="#giftForm" style="color:inherit">choose an amount below</a> and we will fill it in for you.</p>
       </div>
       <div class="bank">
         <span class="eyebrow">Bank transfer</span>
@@ -487,16 +490,27 @@ footer small{color:var(--mist);font-size:13px}
     <form class="formcard" id="giftForm" novalidate>
       <div class="grid2">
         <label class="f">Your name<input type="text" id="gName" autocomplete="name" placeholder="e.g. Uncle Tunde"></label>
-        <label class="f">Amount sent (₦)<input type="number" id="gAmt" inputmode="numeric" min="0" step="500" placeholder="Any amount"></label>
+        <label class="f"><span id="gAmtLabel">Amount (₦)</span><input type="number" id="gAmt" inputmode="numeric" min="0" step="500" placeholder="Any amount"></label>
       </div>
       <div class="chips" id="amtChips" aria-label="Quick amounts"></div>
-      <div class="grid2"><label class="f">Sent to<select id="gAcct"></select></label><label class="f">Towards<select id="gFor"></select></label></div>
+      <fieldset id="gMethodSet">
+        <legend>How are you sending it?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="gm" id="gmOnline" value="online" checked><span>Online with Paystack</span></label>
+          <label class="choice"><input type="radio" name="gm" id="gmTransfer" value="transfer"><span>Bank transfer</span></label>
+        </div>
+      </fieldset>
+      <div class="grid2"><label class="f" id="gAcctWrap">Sent to<select id="gAcct"></select></label><label class="f">Towards<select id="gFor"></select></label></div>
       <label class="f">Message for the couple (optional)<textarea id="gMsg" placeholder="Words of love and prayer"></textarea></label>
       <p class="err" id="gErr" hidden></p>
-      <button class="btn btn-gold" type="submit">Prepare my note</button>
+      <div class="cta-row gift-actions">
+        <a class="btn btn-gold" id="gPayBtn" href="#" target="_blank" rel="noopener">Pay with Paystack</a>
+        <button class="btn btn-gold" type="submit" id="gSubmit">Prepare my note</button>
+      </div>
+      <p class="hint" id="gHint"></p>
       <div class="done" id="gDone" hidden>
         <h3>Thank you so much</h3>
-        <p>Open WhatsApp to send your note to the couple. Please send it only after your transfer is complete.</p>
+        <p id="gDoneText">Open WhatsApp to send your note to the couple.</p>
         <div class="cta-row" id="gWaBtns"></div>
       </div>
     </form>
@@ -548,7 +562,9 @@ const CONFIG = {
   ],
   accounts: [
     { bank: "Opay", number: "9034435770", name: "Ngene Glory Uche" },
-    { bank: "Access Bank", number: "1596611810", name: "Ngene Glory Uche" }
+    { bank: "Access Bank", number: "1596611810", name: "Ngene Glory Uche" },
+    { bank: "GTBank", number: "0208897487", name: "Chikezie Precious Ebubechukwu", currency: "NGN" },
+    { bank: "GTBank", number: "0650125288", name: "Chikezie Precious Ebubechukwu", currency: "USD", note: "Dollar account, for gifts from abroad" }
   ],
   payLink: "https://paystack.shop/pay/kabodsquare",   // Paystack payment page
   streamUrl: "",                                // paste the live stream link here on the day
@@ -636,14 +652,14 @@ $("amtChips").addEventListener("click", e => {
   document.querySelectorAll("#amtChips .chip").forEach(c => c.classList.toggle("sel", c === b));
 });
 $("gAmt").addEventListener("input", () => document.querySelectorAll("#amtChips .chip").forEach(c => c.classList.toggle("sel", c.dataset.n === $("gAmt").value)));
-$("gAcct").innerHTML = CONFIG.accounts.map(a=>`<option>${esc(a.bank)} ${esc(a.number)}</option>`).join("");
+$("gAcct").innerHTML = CONFIG.accounts.map((a,i)=>`<option value="${i}">${esc(a.bank)}${a.currency==="USD"?" USD":""} ${esc(a.number)}</option>`).join("");
 $("gFor").innerHTML = CONFIG.wishes.map(w=>`<option>${esc(w.title)}</option>`).join("");
 $("wishList").addEventListener("click", e => {
   const b = e.target.closest("button[data-w]"); if (!b) return;
   const w = CONFIG.wishes[+b.dataset.w];
   $("gFor").value = w.title;
   $("gAmt").value = b.dataset.full ? w.price : "";
-  $("gAmt").dispatchEvent(new Event("input"));
+  $("gAmt").dispatchEvent(new Event("input")); syncGift();
   if (b.dataset.full && CONFIG.payLink) toast("Full amount filled in. Gift online or transfer, then send your note");
   $("giftForm").scrollIntoView({behavior:"smooth", block:"start"});
   setTimeout(()=> (b.dataset.full ? $("gName") : $("gAmt")).focus({preventScroll:true}), 500);
@@ -658,9 +674,9 @@ if (CONFIG.payLink) { $("payBtn").href = CONFIG.payLink; } else { document.query
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2200); }
 $("acctList").innerHTML = CONFIG.accounts.map((a,i)=>`
   <div class="acct-item">
-    <span class="bk">${esc(a.bank)}</span>
+    <span class="bk">${esc(a.bank)}${a.currency==="USD" ? " · USD" : a.currency ? " · Naira" : ""}</span>
     <div class="acct"><span class="no" id="acct${i}">${esc(a.number)}</span><button class="copy" type="button" data-a="${i}">Copy</button></div>
-    <span class="nm">${esc(a.name)}</span>
+    <span class="nm">${esc(a.name)}</span>${a.note ? `<span class="nm" style="color:var(--gold-soft)">${esc(a.note)}</span>` : ""}
   </div>`).join("");
 $("acctList").addEventListener("click", e => {
   const b = e.target.closest("button[data-a]"); if (!b) return;
@@ -694,6 +710,42 @@ $("rsvpForm").addEventListener("submit", e => {
   $("rDone").scrollIntoView({behavior:"smooth", block:"center"});
 });
 
+/* ---------- Gift form: method, Paystack prefill ---------- */
+const money = (n, cur) => cur === "USD" ? "$" + Number(n).toLocaleString("en-US") : naira(n);
+const giftMode = () => (CONFIG.payLink && $("gmOnline").checked) ? "online" : "transfer";
+const giftAcct = () => CONFIG.accounts[+$("gAcct").value] || CONFIG.accounts[0];
+function payUrl(){
+  try {
+    const u = new URL(CONFIG.payLink);
+    const amt = Number($("gAmt").value);
+    if (amt > 0) u.searchParams.set("amount", String(Math.round(amt)));
+    const parts = $("gName").value.trim().split(/\s+/).filter(Boolean);
+    if (parts.length) u.searchParams.set("first_name", parts[0]);
+    if (parts.length > 1) u.searchParams.set("last_name", parts.slice(1).join(" "));
+    return u.toString();
+  } catch(e) { return CONFIG.payLink; }
+}
+function syncGift(){
+  const mode = giftMode(), usd = mode === "transfer" && giftAcct().currency === "USD";
+  $("gAcctWrap").hidden = mode !== "transfer";
+  $("gPayBtn").hidden = mode !== "online";
+  $("amtChips").hidden = usd;
+  $("gAmtLabel").textContent = usd ? "Amount sent ($)" : mode === "online" ? "Amount (₦)" : "Amount sent (₦)";
+  const amt = Number($("gAmt").value);
+  $("gPayBtn").textContent = amt > 0 ? `Pay ${naira(amt)} with Paystack` : "Pay with Paystack";
+  $("gPayBtn").href = payUrl();
+  $("gSubmit").textContent = mode === "online" ? "Also send a note on WhatsApp" : "Prepare my note";
+  $("gSubmit").className = "btn " + (mode === "online" ? "btn-line note-btn" : "btn-gold");
+  $("gHint").textContent = mode === "online"
+    ? "Paystack opens with your amount and name filled in. You can pay by card, transfer, USSD or bank app."
+    : "Transfer to the account you chose, then send us a note so we can thank you.";
+}
+if (!CONFIG.payLink) { $("gMethodSet").hidden = true; $("gmTransfer").checked = true; }
+["gmOnline","gmTransfer","gAcct"].forEach(id => $(id).addEventListener("change", syncGift));
+["gName","gAmt"].forEach(id => $(id).addEventListener("input", syncGift));
+$("amtChips").addEventListener("click", () => setTimeout(syncGift, 0));
+syncGift();
+
 /* ---------- Gift note ---------- */
 $("giftForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -702,11 +754,15 @@ $("giftForm").addEventListener("submit", e => {
   if (!name){ err.textContent = "Please add your name so the couple can thank you."; err.hidden=false; $("gName").focus(); return; }
   err.hidden = true;
   let msg = `Wedding gift for ${CONFIG.name1} & ${CONFIG.name2}\n\nFrom: ${name}`;
-  if (amt > 0) msg += `\nAmount sent: ${naira(amt)}`;
-  msg += `\nSent to: ${$("gAcct").value}`;
+  const mode = giftMode(), acct = giftAcct();
+  if (amt > 0) msg += `\nAmount: ${money(amt, mode === "transfer" ? acct.currency : "NGN")}`;
+  msg += mode === "online" ? `\nPaid: Online via Paystack` : `\nSent to: ${acct.bank}${acct.currency==="USD"?" USD":""} ${acct.number} (${acct.name})`;
   msg += `\nTowards: ${$("gFor").value}`;
   if ($("gMsg").value.trim()) msg += `\n\nMessage: ${$("gMsg").value.trim()}`;
   $("gWaBtns").innerHTML = waButtons(msg);
+  $("gDoneText").textContent = mode === "online"
+    ? "Open WhatsApp to send your note to the couple. Please send it after your Paystack payment goes through."
+    : "Open WhatsApp to send your note to the couple. Please send it only after your transfer is complete.";
   $("gDone").hidden = false;
   $("gDone").scrollIntoView({behavior:"smooth", block:"center"});
 });

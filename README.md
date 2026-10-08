@@ -45,6 +45,8 @@ Current settings:
 | Wishlist | Power Blender ₦200,000 · Mini Solar Setup ₦1,000,000 · Kitchen support (any amount) · New home support (any amount) · Any amount |
 | Account 1 | Opay · 9034435770 · Ngene Glory Uche |
 | Account 2 | Access Bank · 1596611810 · Ngene Glory Uche |
+| Account 3 | GTBank (Naira) · 0208897487 · Chikezie Precious Ebubechukwu |
+| Account 4 | GTBank (USD / dollar) · 0650125288 · Chikezie Precious Ebubechukwu |
 | RSVP deadline | 18 October 2026 |
 | Hashtag | #GloryAndPrecious26 (placeholder, not confirmed) |
 
@@ -70,3 +72,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-08** — Live at https://glory-and-precious.vercel.app/. Added link-preview tags so WhatsApp shows the photo and title.
 - **2026-10-08** — Venue corrected to *opposite* The Federal Polytechnic, Bida. Directions button now opens the exact Google Maps pin: https://maps.app.goo.gl/5nxTS4azkkPo9rVM6
 - **2026-10-08** — Added Kitchen support and New home support to the wishlist (any amount). Wishlist now shows two per row with the general "Any amount" card full width.
+- **2026-10-08** — Gift form now asks "Online with Paystack" or "Bank transfer". Online opens Paystack with the chosen amount and the guest's name already filled in (Paystack `amount`, `first_name`, `last_name` link options). Added GTBank Naira and USD accounts for Precious.
