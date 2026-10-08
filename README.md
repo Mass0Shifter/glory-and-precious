@@ -1,0 +1,63 @@
+# Glory & Precious — Wedding Website
+
+The wedding website for the Holy Matrimony of **Glory Uchechukwu Ngene & Precious Ebubechukwu Chikezie**,
+Sunday 25 October 2026, 5:00 pm, Treasure Spring Auditorium, The Federal Polytechnic, Bida, Niger State.
+
+Colours: navy blue, champagne gold and white.
+
+## What the site does
+
+- **E-invite**: families, names, date, venue and a live countdown to the Holy Matrimony.
+- **For your prayers**: Court wedding (Tue 20 Oct, Abuja) and Traditional wedding (Sat 24 Oct, Abuja) are shown as information only, not invitations.
+- **Watch live**: a section that shows a "Join the live stream" button once a stream link is added.
+- **RSVP**: guests choose "In Bida", "Watching online" or "Can't make it", then send their reply on WhatsApp.
+- **Gifts**: a "Gift online now" button (Paystack), two bank accounts with copy buttons, a wishlist, and a thank-you note form sent on WhatsApp.
+- No mention of catering anywhere on the site.
+
+## Files
+
+| File | What it is |
+|---|---|
+| `index.html` | The whole website |
+| `images/hero.jpg` | Main invitation photo (navy suit) |
+| `images/trad_full.jpg` | Tall gallery photo (red traditional, full length) |
+| `images/trad_sq.jpg` | Gallery photo (red traditional, close) |
+| `images/couple.jpg` | Gallery photo (evening event) |
+| `netlify.toml` | Settings for Netlify (no build needed) |
+
+To swap a photo, upload a new picture to the `images` folder on GitHub with **exactly the same file name**. Netlify updates the site automatically.
+
+## Changing details (names, links, numbers, accounts)
+
+Every detail lives in one block near the bottom of `index.html`, starting with `const CONFIG = {`.
+The easiest way: ask Claude, e.g. *"Update the wedding site: the live stream link is …"*.
+
+Current settings:
+
+| Setting | Value |
+|---|---|
+| Paystack link (`payLink`) | https://paystack.shop/pay/kabodsquare (**was still in test mode on 8 Oct 2026 — must be switched to Live**) |
+| Live stream (`streamUrl`) | *empty — add on the day* |
+| RSVP / WhatsApp numbers | +234 806 545 2494, +234 703 105 1140 |
+| Account 1 | Opay · 9034435770 · Ngene Glory Uche |
+| Account 2 | Access Bank · 1596611810 · Ngene Glory Uche |
+| RSVP deadline | 18 October 2026 |
+| Hashtag | #GloryAndPrecious26 (placeholder, not confirmed) |
+
+## Seeing RSVPs and gift notes on Netlify
+
+Besides WhatsApp, every RSVP and gift note is also saved on Netlify:
+1. In Netlify, open the site → **Forms**. If asked, click **Enable form detection**, then redeploy once (Deploys → Trigger deploy).
+2. Two forms appear: **rsvp** and **gift**. Each submission shows the guest's details.
+3. To get an email for each one: Forms → **Form notifications** → Add notification → Email.
+
+## Hosting on Netlify (one-time setup)
+
+1. Netlify → **Add new project → Import an existing project → GitHub**.
+2. Pick the `glory-and-precious` repository.
+3. Leave the build command **empty**. Publish directory: `.` (a single dot).
+4. Click **Deploy**. Every change pushed to GitHub goes live automatically.
+
+## Change log
+
+- **2026-10-08** — Site built: e-invite, events, livestream section, WhatsApp RSVP, Paystack + bank gifts, FAQ. Real photos added. Prepared for Netlify with Netlify Forms.
