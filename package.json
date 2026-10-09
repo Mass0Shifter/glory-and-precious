@@ -1,0 +1,9 @@
+{
+  "name": "glory-and-precious",
+  "private": true,
+  "type": "module",
+  "description": "Glory & Precious wedding website with RSVP, gift and visit records",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  }
+}

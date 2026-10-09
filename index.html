@@ -15,6 +15,8 @@
 <link rel="canonical" href="https://glory-and-precious.vercel.app/">
 <meta property="og:type" content="website">
 <style>[hidden]{display:none!important}body{margin:0}</style>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap">
@@ -437,7 +439,7 @@ footer small{color:var(--mist);font-size:13px}
       <label class="f">A note for the couple (optional)<textarea id="rNote" placeholder="Your wishes and prayers for us"></textarea></label>
       <p class="err" id="rErr" hidden></p>
       <button class="btn btn-gold" type="submit">Prepare my RSVP</button>
-      <p class="hint">Your reply goes to the couple on WhatsApp. You'll see it before you send.</p>
+      <p class="hint">Your reply goes to the couple on WhatsApp, and a copy is saved for the couple's guest list.</p>
       <div class="done" id="rDone" hidden>
         <h3 id="rDoneTitle">Almost done</h3>
         <p>Send it to Glory or Precious. WhatsApp opens with your reply ready. Press send there to complete your RSVP.</p>
@@ -538,6 +540,7 @@ footer small{color:var(--mist);font-size:13px}
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
+window.GP_API = true;
 /* ============================================================
    WEDDING DETAILS — every name, date, venue and account lives here.
    Change these values and the whole site updates.
@@ -599,6 +602,15 @@ const CONFIG = {
 
 /* ---------- render ---------- */
 const $ = id => document.getElementById(id);
+
+/* ---------- records for the couple (only on the live site; set by build.py) ---------- */
+const SID = (() => { try { let v = sessionStorage.getItem("gp_sid"); if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem("gp_sid", v); } return v; } catch(e) { return ""; } })();
+function record(path, data){
+  if (!window.GP_API) return;
+  try { fetch("/api/" + path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({session:SID, ...data}), keepalive:true}).catch(()=>{}); } catch(e) {}
+}
+function recordGift(action, extra){ record("track", {type:"gift", action, ...extra}); }
+(() => { try { if (window.GP_API && !sessionStorage.getItem("gp_seen")) { sessionStorage.setItem("gp_seen","1"); record("track", {type:"visit", referrer: document.referrer || ""}); } } catch(e) {} })();
 document.querySelectorAll("[data-c]").forEach(el => { const v = CONFIG[el.dataset.c]; if (v != null) el.textContent = v; });
 
 const wd = new Date(CONFIG.weddingDate);
@@ -679,12 +691,14 @@ $("wishList").addEventListener("click", e => {
   if (b.dataset.full && CONFIG.payLink) toast("Full amount filled in. Gift online or transfer, then send your note");
   $("giftForm").scrollIntoView({behavior:"smooth", block:"start"});
   setTimeout(()=> (b.dataset.full ? $("gName") : $("gAmt")).focus({preventScroll:true}), 500);
+  recordGift(b.dataset.full ? "gift_it_all" : "contribute", {item: w.title, amount: b.dataset.full ? w.price : null});
 });
 
 $("faqList").innerHTML = CONFIG.faq.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("");
 
 /* ---------- online payment ---------- */
 if (CONFIG.payLink) { $("payBtn").href = CONFIG.payLink; } else { document.querySelector(".paycard").hidden = true; }
+$("payBtn").addEventListener("click", () => recordGift("quick_pay_click", {method:"online"}));
 
 /* ---------- accounts & copy ---------- */
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2200); }
@@ -723,6 +737,7 @@ $("rsvpForm").addEventListener("submit", e => {
   $("rWaBtns").innerHTML = waButtons(msg);
   $("rDoneTitle").textContent = mode === "yes" ? "We can't wait to see you" : mode === "online" ? "See you on the stream" : "You'll be missed";
   $("rDone").hidden = false;
+  record("rsvp", {name, phone: $("rPhone").value.trim(), attending: mode==="yes" ? "In Bida" : mode==="online" ? "Watching online" : "Can't make it", guests: mode==="yes" ? $("rGuests").value : 0, note: $("rNote").value.trim()});
   $("rDone").scrollIntoView({behavior:"smooth", block:"center"});
 });
 
@@ -761,6 +776,7 @@ if (!CONFIG.payLink) { $("gMethodSet").hidden = true; $("gmTransfer").checked = 
 ["gName","gAmt"].forEach(id => $(id).addEventListener("input", syncGift));
 $("amtChips").addEventListener("click", () => setTimeout(syncGift, 0));
 syncGift();
+$("gPayBtn").addEventListener("click", () => recordGift("pay_click", {method:"online", name: $("gName").value.trim(), amount: Number($("gAmt").value) || null, item: $("gFor").value}));
 
 /* ---------- Gift note ---------- */
 $("giftForm").addEventListener("submit", e => {
@@ -780,6 +796,8 @@ $("giftForm").addEventListener("submit", e => {
     ? "Open WhatsApp to send your note to the couple. Please send it after your Paystack payment goes through."
     : "Open WhatsApp to send your note to the couple. Please send it only after your transfer is complete.";
   $("gDone").hidden = false;
+  recordGift("note_sent", {method: mode, name, amount: amt > 0 ? amt : null, currency: mode === "transfer" ? (acct.currency || "NGN") : "NGN",
+    item: $("gFor").value, account: mode === "transfer" ? `${acct.bank}${acct.currency==="USD"?" USD":""} ${acct.number}` : "Paystack", message: $("gMsg").value.trim()});
   $("gDone").scrollIntoView({behavior:"smooth", block:"center"});
 });
 </script>

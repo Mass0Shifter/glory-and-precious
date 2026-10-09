@@ -59,6 +59,25 @@ Current settings:
 
 RSVPs and gift notes arrive on WhatsApp (Glory and Precious). Online gifts are recorded in the Paystack dashboard.
 
+## Guest list, gift activity and visits (database)
+
+The site saves a copy of every RSVP, every gift attempt and every visit in a **Neon Postgres** database connected in Vercel → Storage.
+Tables (`rsvps`, `gifts`, `visits`) are created automatically on first use.
+
+- **Admin page:** https://glory-and-precious.vercel.app/admin — password protected. Shows totals, the guest list, gift activity and visits, with "Download spreadsheet" buttons.
+- **Password:** stored only in Vercel → Settings → Environment Variables as `ADMIN_PASSWORD` (never in this repository). To change it, edit that variable and redeploy.
+- **Gift activity = attempts**, not confirmed payments: "Opened Paystack", "Chose Gift it all", "Chose Contribute", "Sent gift note". Confirm money in Paystack and the bank apps.
+- **Visits:** simple counts in the admin page; full detail in Vercel → Analytics (Web Analytics enabled).
+
+| File | What it does |
+|---|---|
+| `api/rsvp.js` | Saves an RSVP |
+| `api/track.js` | Saves visits and gift attempts |
+| `api/admin.js` | Returns the data to the admin page (checks the password) |
+| `api/_db.js` | Database connection and table setup |
+| `admin.html` | The admin page |
+| `package.json` | Lists the database library Vercel installs |
+
 ## For Claude (or a developer) making changes
 
 The editable source is in `_build/`: `wedding.src.html` (the page, with the `CONFIG` block) and `build.py`.
@@ -76,3 +95,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-08** — Added 7 appliances to the wishlist with rounded mid-range Nigerian prices (Jumia/Jiji/Zit, Oct 2026): Washing Machine ₦450k, Water Dispenser ₦250k, Gas Cooker/Oven ₦200k, Microwave ₦150k, Air Fryer ₦80k, Rice Cooker ₦40k, Electric Kettle ₦40k. Wishlist sorted from highest to lowest price.
 - **2026-10-08** — Mini Solar Setup price changed to ₦1,500,000.
 - **2026-10-09** — Added Starlink Gen 3 (Standard Kit) to the wishlist at ₦600,000 (Jumia listing ₦579,999–₦690,000, Oct 2026).
+- **2026-10-09** — Added database records (Neon via Vercel): RSVPs, gift attempts and visits, plus a password-protected admin page at /admin. Enabled Vercel Web Analytics on the page.

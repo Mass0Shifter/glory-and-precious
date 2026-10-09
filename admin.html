@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>G&amp;P Wedding Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Jost:wght@300;400;500&display=swap">
+<style>
+:root{
+  --navy:#0E1B38; --navy-2:#15264B; --navy-3:#1D3260;
+  --gold:#CDAE74; --gold-soft:#E8D6AE; --ivory:#F8F2E7; --mist:#AEB8CF;
+  --line:rgba(205,174,116,.25); --ok:#7FB59A; --warn:#E0A96B; --no:#D98A8A;
+  --f-display:"Gilda Display", Georgia, serif; --f-body:"Jost","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--ivory);font-family:var(--f-body);font-weight:300;font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 64px}
+h1,h2{font-family:var(--f-display);font-weight:400;margin:0}
+h1{font-size:30px;color:var(--gold-soft)}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.btn{font:inherit;font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:10px 16px;border:1px solid var(--gold);background:transparent;color:var(--gold-soft);cursor:pointer}
+.btn:hover{background:rgba(205,174,116,.12)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:var(--gold-soft)}
+.btn:focus-visible,input:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+.login{max-width:380px;margin:12vh auto 0;border:1px solid var(--gold);padding:32px;display:grid;gap:16px;background:var(--navy-2)}
+.login input{font:inherit;font-size:16px;padding:12px;background:var(--navy);border:1px solid var(--line);color:var(--ivory)}
+.err{color:var(--no);font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+.tile{border:1px solid var(--line);padding:16px;background:var(--navy-2)}
+.tile b{display:block;font-family:var(--f-display);font-weight:400;font-size:30px;color:var(--gold-soft);font-variant-numeric:tabular-nums;line-height:1.1}
+.tile span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+.tab{font:inherit;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:10px 16px;background:none;border:0;border-bottom:2px solid transparent;color:var(--mist);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--gold-soft);border-bottom-color:var(--gold)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.bar input{font:inherit;padding:9px 12px;background:var(--navy-2);border:1px solid var(--line);color:var(--ivory);min-width:0;flex:1;max-width:320px}
+.scroll{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(205,174,116,.12);vertical-align:top}
+th{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:var(--navy-2);position:sticky;top:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.when{white-space:nowrap;color:var(--mist);font-size:13px}
+td.note{max-width:320px;color:var(--mist)}
+.pill{display:inline-block;padding:2px 10px;font-size:12px;border:1px solid;white-space:nowrap}
+.p-yes{color:var(--ok);border-color:var(--ok)} .p-online{color:var(--gold-soft);border-color:var(--gold)} .p-no{color:var(--no);border-color:var(--no)}
+.empty{padding:28px;text-align:center;color:var(--mist)}
+.hint{color:var(--mist);font-size:13px;margin-top:10px}
+.days{display:flex;align-items:flex-end;gap:4px;height:140px;padding:12px;border:1px solid var(--line);background:var(--navy-2);overflow-x:auto}
+.day{flex:1 0 18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.day i{display:block;width:100%;background:linear-gradient(180deg,var(--gold-soft),var(--gold));min-height:2px}
+.day small{font-size:10px;color:var(--mist);font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.list{border:1px solid var(--line);background:var(--navy-2)}
+.list div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(205,174,116,.12);overflow-wrap:anywhere}
+.list b{font-weight:400;color:var(--gold-soft);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <form class="login" id="login">
+    <span class="eyebrow">Glory &amp; Precious</span>
+    <h1>Wedding admin</h1>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password" required>
+    <p class="err" id="loginErr" hidden></p>
+    <button class="btn btn-gold" type="submit">Open</button>
+  </form>
+
+  <main id="app" hidden>
+    <div class="top">
+      <div><span class="eyebrow">Glory &amp; Precious · 25 October 2026</span><h1>Wedding admin</h1></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="refresh" type="button">Refresh</button>
+        <button class="btn" id="logout" type="button">Lock</button>
+      </div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="guests" aria-selected="true">Guests</button>
+      <button class="tab" role="tab" data-tab="gifts" aria-selected="false">Gift activity</button>
+      <button class="tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
+    </div>
+
+    <section id="tab-guests">
+      <div class="bar"><input type="search" id="qGuests" placeholder="Search name or phone"><button class="btn" type="button" data-csv="rsvps">Download spreadsheet</button></div>
+      <div class="scroll"><table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Attending</th><th>Guests</th><th>Note</th></tr></thead><tbody id="tGuests"></tbody></table></div>
+      <p class="hint">If someone replies more than once, all their replies show here. The newest is at the top.</p>
+    </section>
+
+    <section id="tab-gifts" hidden>
+      <div class="bar"><input type="search" id="qGifts" placeholder="Search name or item"><button class="btn" type="button" data-csv="gifts">Download spreadsheet</button></div>
+      <div class="scroll"><table><thead><tr><th>When</th><th>What happened</th><th>Name</th><th>Amount</th><th>Item</th><th>Method</th><th>Account</th><th>Message</th></tr></thead><tbody id="tGifts"></tbody></table></div>
+      <p class="hint">These are attempts: a guest tapped a gift button or sent a gift note. Check Paystack and your bank apps to confirm money received.</p>
+    </section>
+
+    <section id="tab-visits" hidden>
+      <div class="grid2">
+        <div><p class="eyebrow" style="margin:0 0 8px">Visits per day · last 30 days</p><div class="days" id="days"></div></div>
+        <div><p class="eyebrow" style="margin:0 0 8px">Where visitors came from</p><div class="list" id="sources"></div></div>
+      </div>
+      <p class="hint">More detail (countries, pages, devices) is in Vercel → your project → Analytics.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const when = d => new Date(d).toLocaleString("en-GB",{timeZone:"Africa/Lagos",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const money = (n,c) => n == null ? "" : (c === "USD" ? "$" + Number(n).toLocaleString("en-US") : "₦" + Number(n).toLocaleString("en-NG"));
+const ACTIONS = {pay_click:"Opened Paystack", quick_pay_click:"Opened Paystack (top button)", gift_it_all:"Chose Gift it all", contribute:"Chose Contribute", note_sent:"Sent gift note"};
+let KEY = "", DATA = null;
+try { KEY = sessionStorage.getItem("gp_admin") || ""; } catch(e) {}
+
+async function load(){
+  const r = await fetch("/api/admin", {headers:{"x-admin-key":KEY}, cache:"no-store"});
+  const j = await r.json().catch(()=>({ok:false,error:"Could not reach the server"}));
+  if (!j.ok) throw Object.assign(new Error(j.error || "Error"), {status:r.status});
+  DATA = j; render();
+}
+function render(){
+  const R = DATA.rsvps, G = DATA.gifts, V = DATA.visits;
+  // latest reply per name+phone for the summary
+  const latest = new Map(); [...R].reverse().forEach(x => latest.set((x.name+"|"+(x.phone||"")).toLowerCase(), x));
+  const L = [...latest.values()];
+  const bida = L.filter(x=>x.attending==="In Bida"), online = L.filter(x=>x.attending==="Watching online"), no = L.filter(x=>x.attending==="Can't make it");
+  const notes = G.filter(g=>g.action==="note_sent");
+  const ngnNoted = notes.filter(g=>g.currency!=="USD").reduce((s,g)=>s+Number(g.amount||0),0);
+  $("tiles").innerHTML = [
+    [bida.reduce((s,x)=>s+(x.guests||1),0), "People coming to Bida"],
+    [bida.length, "RSVPs: in Bida"], [online.length, "Watching online"], [no.length, "Can't make it"],
+    [G.filter(g=>g.action==="pay_click"||g.action==="quick_pay_click").length, "Paystack opens"],
+    [notes.length, "Gift notes"], ["₦" + ngnNoted.toLocaleString("en-NG"), "Total in gift notes"],
+    [V.visitors||0, "Visitors"], [V.visits||0, "Visits"]
+  ].map(([v,l])=>`<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join("");
+  drawGuests(); drawGifts();
+  const max = Math.max(1, ...V.byDay.map(d=>d.visits));
+  $("days").innerHTML = V.byDay.length ? V.byDay.map(d=>`<div class="day" title="${esc(d.day)}: ${d.visits} visits"><small>${d.visits}</small><i style="height:${Math.round(d.visits/max*100)}%"></i><small>${esc(d.day.slice(8))}</small></div>`).join("") : `<p class="empty" style="margin:auto">No visits yet</p>`;
+  $("sources").innerHTML = V.sources.length ? V.sources.map(s=>`<div><span>${esc(s.source.replace(/^https?:\/\//,""))}</span><b>${s.visits}</b></div>`).join("") : `<p class="empty">No visits yet</p>`;
+}
+function drawGuests(){
+  const q = $("qGuests").value.trim().toLowerCase();
+  const rows = DATA.rsvps.filter(x => !q || (x.name+" "+(x.phone||"")).toLowerCase().includes(q));
+  const pill = a => a==="In Bida" ? "p-yes" : a==="Watching online" ? "p-online" : "p-no";
+  $("tGuests").innerHTML = rows.length ? rows.map(x=>`<tr><td class="when">${when(x.created_at)}</td><td>${esc(x.name)}</td><td class="num">${esc(x.phone)}</td><td><span class="pill ${pill(x.attending)}">${esc(x.attending)}</span></td><td class="num">${x.attending==="In Bida"?x.guests:""}</td><td class="note">${esc(x.note)}</td></tr>`).join("")
+    : `<tr><td colspan="6" class="empty">No RSVPs yet. They appear here as soon as guests reply on the website.</td></tr>`;
+}
+function drawGifts(){
+  const q = $("qGifts").value.trim().toLowerCase();
+  const rows = DATA.gifts.filter(x => !q || ((x.name||"")+" "+(x.item||"")).toLowerCase().includes(q));
+  $("tGifts").innerHTML = rows.length ? rows.map(x=>`<tr><td class="when">${when(x.created_at)}</td><td>${esc(ACTIONS[x.action]||x.action)}</td><td>${esc(x.name)}</td><td class="num">${money(x.amount,x.currency)}</td><td>${esc(x.item)}</td><td>${esc(x.method==="online"?"Paystack":x.method==="transfer"?"Transfer":x.method)}</td><td>${esc(x.account)}</td><td class="note">${esc(x.message)}</td></tr>`).join("")
+    : `<tr><td colspan="8" class="empty">No gift activity yet.</td></tr>`;
+}
+function csv(name){
+  const rows = DATA[name]; if (!rows.length) return;
+  const cols = Object.keys(rows[0]);
+  const cell = v => { v = v==null ? "" : String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const text = "﻿" + [cols.join(","), ...rows.map(r=>cols.map(c=>cell(c==="action"?(ACTIONS[r[c]]||r[c]):r[c])).join(","))].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text],{type:"text/csv"}));
+  a.download = `glory-precious-${name==="rsvps"?"guests":"gifts"}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function show(app){ $("login").hidden = app; $("app").hidden = !app; }
+
+$("login").addEventListener("submit", async e => {
+  e.preventDefault(); KEY = $("pw").value; $("loginErr").hidden = true;
+  try { await load(); try{sessionStorage.setItem("gp_admin",KEY)}catch(e){} show(true); }
+  catch(err){ $("loginErr").textContent = err.message; $("loginErr").hidden = false; }
+});
+$("logout").onclick = () => { KEY=""; try{sessionStorage.removeItem("gp_admin")}catch(e){} $("pw").value=""; show(false); };
+$("refresh").onclick = async () => { $("refresh").textContent="Loading…"; try{await load();}catch(e){} $("refresh").textContent="Refresh"; };
+$("qGuests").oninput = drawGuests; $("qGifts").oninput = drawGifts;
+document.querySelectorAll("[data-csv]").forEach(b => b.onclick = () => csv(b.dataset.csv));
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x===t));
+  ["guests","gifts","visits"].forEach(n => $("tab-"+n).hidden = n !== t.dataset.tab);
+});
+if (KEY) load().then(()=>show(true)).catch(()=>show(false));
+</script>
+</body>
+</html>

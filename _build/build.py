@@ -33,6 +33,8 @@ head='''<!doctype html>
 <meta property="og:type" content="website">
 <style>[hidden]{display:none!important}body{margin:0}</style>
 '''
+body=body.replace('<script>\n','<script>\nwindow.GP_API = true;\n',1)
+head+='<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>\n<script defer src="/_vercel/insights/script.js"></script>\n'
 i=body.index('<a class="livebar"')
 open(R+'/index.html','w').write(head+body[:i]+'</head>\n<body>\n'+body[i:]+'\n</body>\n</html>\n')
 print('built')
