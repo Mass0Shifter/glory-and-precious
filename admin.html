@@ -161,7 +161,7 @@ function drawGifts(){
 }
 function csv(name){
   const rows = DATA[name]; if (!rows.length) return;
-  const cols = Object.keys(rows[0]);
+  const cols = Object.keys(rows[0]).filter(c => c !== "id");
   const cell = v => { v = v==null ? "" : String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
   const text = "﻿" + [cols.join(","), ...rows.map(r=>cols.map(c=>cell(c==="action"?(ACTIONS[r[c]]||r[c]):r[c])).join(","))].join("\n");
   const a = document.createElement("a");

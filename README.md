@@ -59,24 +59,26 @@ Current settings:
 
 RSVPs and gift notes arrive on WhatsApp (Glory and Precious). Online gifts are recorded in the Paystack dashboard.
 
-## Guest list, gift activity and visits (database)
+## Guest list, gift activity and visits (records)
 
-The site saves a copy of every RSVP, every gift attempt and every visit in a **Neon Postgres** database connected in Vercel → Storage.
-Tables (`rsvps`, `gifts`, `visits`) are created automatically on first use.
+The site saves a copy of every RSVP, every gift attempt and every visit in a **private Vercel Blob store** named
+`glory-precious-records` (Vercel → Storage), connected to this project. Each record is a small private file:
+`rsvps/…json`, `gifts/…json`, `visits/…txt`. Nobody can open these files without the store's token.
 
 - **Admin page:** https://glory-and-precious.vercel.app/admin — password protected. Shows totals, the guest list, gift activity and visits, with "Download spreadsheet" buttons.
-- **Password:** stored only in Vercel → Settings → Environment Variables as `ADMIN_PASSWORD` (never in this repository). To change it, edit that variable and redeploy.
+- **Password:** stored only in Vercel → Settings → Environment Variables as `ADMIN_PASSWORD` (sensitive; never in this repository). To change it, edit that variable and redeploy.
+- **Storage token:** `BLOB_READ_WRITE_TOKEN`, added automatically by Vercel when the store was connected.
 - **Gift activity = attempts**, not confirmed payments: "Opened Paystack", "Chose Gift it all", "Chose Contribute", "Sent gift note". Confirm money in Paystack and the bank apps.
-- **Visits:** simple counts in the admin page; full detail in Vercel → Analytics (Web Analytics enabled).
+- **Visits:** simple counts in the admin page; full detail in Vercel → Analytics (Web Analytics).
 
 | File | What it does |
 |---|---|
 | `api/rsvp.js` | Saves an RSVP |
 | `api/track.js` | Saves visits and gift attempts |
 | `api/admin.js` | Returns the data to the admin page (checks the password) |
-| `api/_db.js` | Database connection and table setup |
+| `api/_store.js` | Reads and writes the private Blob store |
 | `admin.html` | The admin page |
-| `package.json` | Lists the database library Vercel installs |
+| `package.json` | Lists the storage library (`@vercel/blob`) Vercel installs |
 
 ## For Claude (or a developer) making changes
 
@@ -96,3 +98,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-08** — Mini Solar Setup price changed to ₦1,500,000.
 - **2026-10-09** — Added Starlink Gen 3 (Standard Kit) to the wishlist at ₦600,000 (Jumia listing ₦579,999–₦690,000, Oct 2026).
 - **2026-10-09** — Added database records (Neon via Vercel): RSVPs, gift attempts and visits, plus a password-protected admin page at /admin. Enabled Vercel Web Analytics on the page.
+- **2026-10-10** — Switched records storage from Neon (never provisioned) to a private Vercel Blob store `glory-precious-records` (region cdg1), created and connected via the Vercel connector. ADMIN_PASSWORD set in Vercel as a sensitive variable. Admin page live at /admin.

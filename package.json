@@ -4,6 +4,6 @@
   "type": "module",
   "description": "Glory & Precious wedding website with RSVP, gift and visit records",
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.0"
+    "@vercel/blob": "^2.3.0"
   }
 }
