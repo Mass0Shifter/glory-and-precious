@@ -245,7 +245,9 @@ legend{font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:upperc
 @media (max-width:520px){.notice-row{grid-template-columns:1fr}}
 /* live */
 .live{background:linear-gradient(160deg,var(--navy-3),var(--navy) 70%);border-block:1px solid rgba(205,174,116,.25);padding-block:72px}
-.live-card{max-width:680px;margin:0 auto;text-align:center;display:grid;gap:16px;justify-items:center}
+.player{width:100%;aspect-ratio:16/9;max-width:100%;border:1px solid var(--gold);background:#000;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.player iframe{width:100%;height:100%;border:0;display:block}
+.live-card{max-width:860px;margin:0 auto;text-align:center;display:grid;gap:16px;justify-items:center}
 .live-card h2{font-size:clamp(30px,4.5vw,44px)}
 .live-card p{color:var(--mist);max-width:54ch}
 .live-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(205,174,116,.5);padding:6px 14px;font-size:11px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-soft)}
@@ -406,6 +408,7 @@ footer small{color:var(--mist);font-size:13px}
       <span class="live-chip" id="liveChip"><span class="dot"></span><span id="liveChipText">Live stream</span></span>
       <h2>Celebrate with us from wherever you are</h2>
       <p id="liveText">Far away from Bida? We will stream the Holy Matrimony online. The link will appear right here on Sunday 25 October, before the service begins at 5:00 pm.</p>
+      <div class="player" id="livePlayer" hidden></div>
       <div class="cta-row" id="liveCta"></div>
       <p class="hint-dark">Watching online? You can still <a href="#gifts">send a gift</a> from anywhere.</p>
     </div>
@@ -425,6 +428,8 @@ footer small{color:var(--mist);font-size:13px}
         <label class="f">Full name<input type="text" id="rName" autocomplete="name" placeholder="e.g. Ngozi Adeyemi"></label>
         <label class="f">Phone number<input type="tel" id="rPhone" autocomplete="tel" placeholder="080..."></label>
       </div>
+      <label class="f">Email<input type="email" id="rEmail" autocomplete="email" inputmode="email" placeholder="you@example.com"></label>
+      <p class="hint" style="margin-top:-12px">We'll email you the live stream link on the wedding day.</p>
       <fieldset>
         <legend>Attending?</legend>
         <div class="choices">
@@ -593,7 +598,7 @@ const CONFIG = {
   ],
   faq: [
     ["Which events am I invited to?", "Our invitation is to the Holy Matrimony in Bida on Sunday 25 October. The court and traditional weddings in Abuja are family ceremonies; we share them so you can keep us in your prayers."],
-    ["How do I watch online?", "Come back to this page on Sunday 25 October. The live stream button will appear in the Watch live section before 5:00 pm."],
+    ["How do I watch online?", "Come back to this page on Sunday 25 October. The live stream plays right here in the Watch live section from shortly before 5:00 pm. Add your email when you RSVP and we will send you the link too."],
     ["Where exactly is the venue in Bida?", "Treasure Spring Auditorium is opposite The Federal Polytechnic, Bida, Niger State. Use the Directions button on the Holy Matrimony card, or call +234 806 545 2494 or +234 703 105 1140 on the day."],
     ["Can I bring a plus-one?", "Please ask us before you RSVP so we can plan seating."],
     ["Do I have to give a gift?", "Not at all. Having you there is what matters most. The gift section is only for those who have asked."]
@@ -634,16 +639,46 @@ const romans = ["i","ii","iii","iv","v"];
 $("noticeList").innerHTML = CONFIG.events.map(e=>`
   <div class="notice"><b>${esc(e.title)}</b><span>${esc(e.when)} · ${esc(e.where)}</span></div>`).join("");
 
-/* live stream */
-if (CONFIG.streamUrl) {
-  const a = `<a class="btn btn-gold" href="${esc(CONFIG.streamUrl)}" target="_blank" rel="noopener">Join the live stream</a>`;
-  $("liveCta").innerHTML = a;
-  $("liveChip").classList.add("on"); $("liveChipText").textContent = "Live now";
-  $("liveText").textContent = "Tap below to watch the Holy Matrimony live from Treasure Spring Auditorium, Bida.";
-  $("liveBar").href = CONFIG.streamUrl; $("liveBar").target = "_blank"; $("liveBar").rel = "noopener"; $("liveBar").hidden = false;
-} else {
-  $("liveCta").innerHTML = `<span class="soon">Link coming on 25 October</span>`;
+/* live stream: plays inside the page when a YouTube link is set (in /admin, or CONFIG.streamUrl) */
+function youTubeEmbed(url){
+  try {
+    const u = new URL(url), h = u.hostname.replace(/^www\.|^m\./, "");
+    let id = null;
+    if (h === "youtu.be") id = u.pathname.slice(1).split("/")[0];
+    else if (/youtube\.com$/.test(h)) {
+      if (u.searchParams.get("v")) id = u.searchParams.get("v");
+      const m = u.pathname.match(/^\/(live|embed|shorts)\/([\w-]{6,})/); if (m && m[2] !== "live_stream") id = m[2];
+      const ch = u.pathname.match(/^\/channel\/(UC[\w-]{10,})/);
+      if (!id && ch) return `https://www.youtube-nocookie.com/embed/live_stream?channel=${ch[1]}`;
+    }
+    return id && /^[\w-]{6,}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1` : null;
+  } catch(e) { return null; }
 }
+let LIVE_URL = "";
+function showStream(url){
+  if (url === LIVE_URL) return; LIVE_URL = url || "";
+  if (!url) {
+    $("livePlayer").hidden = true; $("livePlayer").innerHTML = "";
+    $("liveChip").classList.remove("on"); $("liveChipText").textContent = "Live stream";
+    $("liveText").textContent = "Far away from Bida? We will stream the Holy Matrimony online. The stream will play right here on Sunday 25 October, before the service begins at 5:00 pm.";
+    $("liveCta").innerHTML = `<span class="soon">Stream starts on 25 October</span>`;
+    $("liveBar").hidden = true; return;
+  }
+  const embed = youTubeEmbed(url);
+  $("liveChip").classList.add("on"); $("liveChipText").textContent = "Live now";
+  $("liveText").textContent = embed ? "Watching from afar? The Holy Matrimony is streaming live below from Treasure Spring Auditorium, Bida." : "Tap below to watch the Holy Matrimony live from Treasure Spring Auditorium, Bida.";
+  $("livePlayer").innerHTML = embed ? `<iframe src="${esc(embed)}" title="Glory & Precious live stream" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>` : "";
+  $("livePlayer").hidden = !embed;
+  $("liveCta").innerHTML = `<a class="btn ${embed ? "btn-line" : "btn-gold"}" href="${esc(url)}" target="_blank" rel="noopener">${embed ? "Open in YouTube" : "Join the live stream"}</a>`;
+  $("liveBar").href = "#live"; $("liveBar").removeAttribute("target"); $("liveBar").hidden = false;
+}
+showStream(CONFIG.streamUrl);
+async function checkStream(){
+  if (!window.GP_API) return;
+  try { const r = await fetch("/api/stream", {cache:"no-store"}); const j = await r.json(); if (j && j.ok) showStream(j.url || CONFIG.streamUrl); } catch(e) {}
+}
+checkStream();
+setInterval(checkStream, new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Lagos"}) === "2026-10-25" ? 60000 : 600000);
 
 const ICONS = {
   plane:'<path d="M3 13l18-8-6 16-3-7-9-1z"/>',
@@ -727,9 +762,13 @@ $("rsvpForm").addEventListener("submit", e => {
   const mode = $("attYes").checked ? "yes" : $("attOnline").checked ? "online" : "no";
   const err = $("rErr");
   if (!name){ err.textContent = "Please add your name so we know who is replying."; err.hidden=false; $("rName").focus(); return; }
+  const email = $("rEmail").value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ err.textContent = "Please check your email address. It should look like name@example.com."; err.hidden=false; $("rEmail").focus(); return; }
+  if (!email && mode === "online"){ err.textContent = "Please add your email so we can send you the live stream link."; err.hidden=false; $("rEmail").focus(); return; }
   err.hidden = true;
   let msg = `RSVP for ${CONFIG.name1} & ${CONFIG.name2}'s Holy Matrimony\n\nName: ${name}`;
   if ($("rPhone").value.trim()) msg += `\nPhone: ${$("rPhone").value.trim()}`;
+  if (email) msg += `\nEmail: ${email}`;
   msg += mode === "yes" ? `\nAttending: Yes, in Bida\nGuests: ${$("rGuests").value}`
        : mode === "online" ? `\nAttending: Watching online`
        : `\nAttending: Sorry, I can't make it`;
@@ -737,7 +776,7 @@ $("rsvpForm").addEventListener("submit", e => {
   $("rWaBtns").innerHTML = waButtons(msg);
   $("rDoneTitle").textContent = mode === "yes" ? "We can't wait to see you" : mode === "online" ? "See you on the stream" : "You'll be missed";
   $("rDone").hidden = false;
-  record("rsvp", {name, phone: $("rPhone").value.trim(), attending: mode==="yes" ? "In Bida" : mode==="online" ? "Watching online" : "Can't make it", guests: mode==="yes" ? $("rGuests").value : 0, note: $("rNote").value.trim()});
+  record("rsvp", {name, phone: $("rPhone").value.trim(), email, attending: mode==="yes" ? "In Bida" : mode==="online" ? "Watching online" : "Can't make it", guests: mode==="yes" ? $("rGuests").value : 0, note: $("rNote").value.trim()});
   $("rDone").scrollIntoView({behavior:"smooth", block:"center"});
 });
 

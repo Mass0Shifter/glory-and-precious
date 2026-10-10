@@ -26,6 +26,22 @@ export async function saveVisit({ session, referrer, device, country }) {
   await put(`visits/${name}.txt`, "1", { access: "private", addRandomSuffix: true, contentType: "text/plain" });
 }
 
+// Small settings file (e.g. the live stream link), overwritten in place.
+export async function saveConfig(name, data) {
+  storeReady();
+  await put(`config/${name}.json`, JSON.stringify({ ...data, updated_at: new Date().toISOString() }), {
+    access: "private", addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", cacheControlMaxAge: 60
+  });
+}
+export async function readConfig(name) {
+  storeReady();
+  try {
+    const r = await get(`config/${name}.json`, { access: "private", useCache: false });
+    if (!r || r.statusCode !== 200 || !r.stream) return {};
+    return JSON.parse(await new Response(r.stream).text());
+  } catch { return {}; }
+}
+
 export async function listAll(prefix) {
   const out = []; let cursor;
   do {

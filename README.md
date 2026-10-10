@@ -70,12 +70,15 @@ The site saves a copy of every RSVP, every gift attempt and every visit in a **p
 - **Storage token:** `BLOB_READ_WRITE_TOKEN`, added automatically by Vercel when the store was connected.
 - **Gift activity = attempts**, not confirmed payments: "Opened Paystack", "Chose Gift it all", "Chose Contribute", "Sent gift note". Confirm money in Paystack and the bank apps.
 - **Visits:** simple counts in the admin page; full detail in Vercel → Analytics (Web Analytics).
+- **Emails:** the RSVP form asks for an email (required only for "I'll watch online"). Admin → *Live stream & emails* shows the count, copies all addresses (for Gmail **Bcc**) and has a ready-to-copy message.
+- **Live stream (on the day):** Admin → *Live stream & emails* → paste the YouTube link → **Save and go live**. Within about a minute the video plays inside the website's Watch live section and a gold "We are live now" bar appears. Works with `youtube.com/live/…`, `youtube.com/watch?v=…`, `youtu.be/…` and `youtube.com/channel/UC…` links. Stored in `config/stream.json` in the Blob store; `api/stream.js` serves it to the site.
 
 | File | What it does |
 |---|---|
 | `api/rsvp.js` | Saves an RSVP |
 | `api/track.js` | Saves visits and gift attempts |
-| `api/admin.js` | Returns the data to the admin page (checks the password) |
+| `api/admin.js` | Returns the data to the admin page and saves the stream link (checks the password) |
+| `api/stream.js` | Tells the website the current live stream link |
 | `api/_store.js` | Reads and writes the private Blob store |
 | `admin.html` | The admin page |
 | `package.json` | Lists the storage library (`@vercel/blob`) Vercel installs |
@@ -99,3 +102,4 @@ Run `python3 _build/build.py` from the folder *above* this repo with the photos 
 - **2026-10-09** — Added Starlink Gen 3 (Standard Kit) to the wishlist at ₦600,000 (Jumia listing ₦579,999–₦690,000, Oct 2026).
 - **2026-10-09** — Added database records (Neon via Vercel): RSVPs, gift attempts and visits, plus a password-protected admin page at /admin. Enabled Vercel Web Analytics on the page.
 - **2026-10-10** — Switched records storage from Neon (never provisioned) to a private Vercel Blob store `glory-precious-records` (region cdg1), created and connected via the Vercel connector. ADMIN_PASSWORD set in Vercel as a sensitive variable. Admin page live at /admin.
+- **2026-10-10** — RSVP form now collects email. Admin page gained a *Live stream & emails* tab: set the YouTube link (plays inside the site, checked every minute on 25 Oct) and copy guest emails plus a ready message.

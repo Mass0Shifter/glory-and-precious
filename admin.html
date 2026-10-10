@@ -57,6 +57,15 @@ td.note{max-width:320px;color:var(--mist)}
 @media (max-width:760px){.grid2{grid-template-columns:1fr}}
 .list{border:1px solid var(--line);background:var(--navy-2)}
 .list div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(205,174,116,.12);overflow-wrap:anywhere}
+.panel{border:1px solid var(--line);background:var(--navy-2);padding:20px;display:grid;gap:12px;align-content:start;min-width:0}
+.panel h2{font-size:24px;color:var(--gold-soft)}
+.panel input,.panel textarea{font:inherit;font-size:15px;padding:11px 12px;background:var(--navy);border:1px solid var(--line);color:var(--ivory);width:100%}
+.panel textarea{resize:vertical;line-height:1.5}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold-soft)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.preview{aspect-ratio:16/9;border:1px solid var(--gold);background:#000}
+.preview iframe{width:100%;height:100%;border:0;display:block}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--gold);color:var(--navy);padding:10px 18px;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;z-index:9}
 .list b{font-weight:400;color:var(--gold-soft);font-variant-numeric:tabular-nums}
 </style>
 </head>
@@ -84,15 +93,48 @@ td.note{max-width:320px;color:var(--mist)}
     <div class="tiles" id="tiles"></div>
 
     <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="live" aria-selected="false">Live stream &amp; emails</button>
       <button class="tab" role="tab" data-tab="guests" aria-selected="true">Guests</button>
       <button class="tab" role="tab" data-tab="gifts" aria-selected="false">Gift activity</button>
       <button class="tab" role="tab" data-tab="visits" aria-selected="false">Visits</button>
     </div>
 
     <section id="tab-guests">
-      <div class="bar"><input type="search" id="qGuests" placeholder="Search name or phone"><button class="btn" type="button" data-csv="rsvps">Download spreadsheet</button></div>
-      <div class="scroll"><table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Attending</th><th>Guests</th><th>Note</th></tr></thead><tbody id="tGuests"></tbody></table></div>
+      <div class="bar"><input type="search" id="qGuests" placeholder="Search name, phone or email"><button class="btn" type="button" data-csv="rsvps">Download spreadsheet</button></div>
+      <div class="scroll"><table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Email</th><th>Attending</th><th>Guests</th><th>Note</th></tr></thead><tbody id="tGuests"></tbody></table></div>
       <p class="hint">If someone replies more than once, all their replies show here. The newest is at the top.</p>
+    </section>
+
+    <section id="tab-live" hidden>
+      <div class="grid2">
+        <div class="panel">
+          <p class="eyebrow" style="margin:0">1 · Live stream</p>
+          <h2>YouTube link</h2>
+          <p class="hint" style="margin:0">Paste the YouTube link when your stream is ready (for example <span class="mono">youtube.com/live/…</span> or <span class="mono">youtu.be/…</span>). Guests on the website see the video playing inside the page within about a minute, plus a gold "We are live now" bar at the top.</p>
+          <label for="streamUrl" class="sr">YouTube link</label>
+          <input type="url" id="streamUrl" placeholder="https://www.youtube.com/live/…" autocomplete="off">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-gold" type="button" id="saveStream">Save and go live</button>
+            <button class="btn" type="button" id="clearStream">Remove link</button>
+          </div>
+          <p id="streamState" class="hint" style="margin:0"></p>
+          <div class="preview" id="streamPreview" hidden></div>
+        </div>
+        <div class="panel">
+          <p class="eyebrow" style="margin:0">2 · Email your guests</p>
+          <h2><span id="emailCount">0</span> guest emails</h2>
+          <p class="hint" style="margin:0">Copy the addresses into the <b>Bcc</b> field of a new email in Gmail (so guests can't see each other's addresses), then copy the message below into the email.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" type="button" id="copyEmails">Copy all emails</button>
+            <button class="btn" type="button" id="copyOnline">Copy "watching online" only</button>
+          </div>
+          <label class="hint" for="mailSubject" style="margin:0">Subject</label>
+          <input type="text" id="mailSubject" value="We're live! Watch Glory & Precious's wedding now">
+          <label class="hint" for="mailBody" style="margin:0">Message</label>
+          <textarea id="mailBody" rows="9"></textarea>
+          <button class="btn" type="button" id="copyMsg">Copy message</button>
+        </div>
+      </div>
     </section>
 
     <section id="tab-gifts" hidden>
@@ -111,8 +153,42 @@ td.note{max-width:320px;color:var(--mist)}
   </main>
 </div>
 
+<div class="toast" id="toast" hidden></div>
 <script>
 const $ = id => document.getElementById(id);
+const SITE = "https://glory-and-precious.vercel.app";
+function toast(m){ const t=$("toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2400); }
+async function copy(text, label){
+  try { await navigator.clipboard.writeText(text); toast(label + " copied"); }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast(label + " copied");}catch(_){ toast("Copy failed. Select and copy by hand"); } ta.remove(); }
+}
+function youTubeEmbed(url){
+  try {
+    const u = new URL(url), h = u.hostname.replace(/^www\.|^m\./, ""); let id = null;
+    if (h === "youtu.be") id = u.pathname.slice(1).split("/")[0];
+    else if (/youtube\.com$/.test(h)) {
+      if (u.searchParams.get("v")) id = u.searchParams.get("v");
+      const m = u.pathname.match(/^\/(live|embed|shorts)\/([\w-]{6,})/); if (m && m[2] !== "live_stream") id = m[2];
+      const ch = u.pathname.match(/^\/channel\/(UC[\w-]{10,})/); if (!id && ch) return `https://www.youtube-nocookie.com/embed/live_stream?channel=${ch[1]}`;
+    }
+    return id && /^[\w-]{6,}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}?rel=0` : null;
+  } catch(e) { return null; }
+}
+function defaultBody(link){
+  return `Dear friend,
+
+Glory and Precious's Holy Matrimony is starting now, live from Treasure Spring Auditorium, Bida.
+
+Watch it here: ${link || SITE + "/#live"}
+
+The stream also plays on our wedding website: ${SITE}/#live
+
+Thank you for celebrating with us from wherever you are.
+
+With love,
+Glory & Precious`;
+}
+let BODY_EDITED = false;
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const when = d => new Date(d).toLocaleString("en-GB",{timeZone:"Africa/Lagos",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const money = (n,c) => n == null ? "" : (c === "USD" ? "$" + Number(n).toLocaleString("en-US") : "₦" + Number(n).toLocaleString("en-NG"));
@@ -141,17 +217,40 @@ function render(){
     [notes.length, "Gift notes"], ["₦" + ngnNoted.toLocaleString("en-NG"), "Total in gift notes"],
     [V.visitors||0, "Visitors"], [V.visits||0, "Visits"]
   ].map(([v,l])=>`<div class="tile"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join("");
-  drawGuests(); drawGifts();
+  drawGuests(); drawGifts(); drawLive();
   const max = Math.max(1, ...V.byDay.map(d=>d.visits));
   $("days").innerHTML = V.byDay.length ? V.byDay.map(d=>`<div class="day" title="${esc(d.day)}: ${d.visits} visits"><small>${d.visits}</small><i style="height:${Math.round(d.visits/max*100)}%"></i><small>${esc(d.day.slice(8))}</small></div>`).join("") : `<p class="empty" style="margin:auto">No visits yet</p>`;
   $("sources").innerHTML = V.sources.length ? V.sources.map(s=>`<div><span>${esc(s.source.replace(/^https?:\/\//,""))}</span><b>${s.visits}</b></div>`).join("") : `<p class="empty">No visits yet</p>`;
 }
+function guestEmails(onlineOnly){
+  const seen = new Set();
+  DATA.rsvps.forEach(x => { if (x.email && (!onlineOnly || x.attending === "Watching online")) seen.add(x.email.toLowerCase()); });
+  return [...seen];
+}
+function drawLive(){
+  const url = (DATA.stream && DATA.stream.url) || "";
+  if (document.activeElement !== $("streamUrl")) $("streamUrl").value = url;
+  const embed = url ? youTubeEmbed(url) : null;
+  $("streamState").innerHTML = url
+    ? (embed ? "Live on the website now. The video below is what guests see." : "Saved. This link can't play inside the page, so guests get a <b>Join the live stream</b> button instead. Use a youtube.com/live/… or youtu.be/… link to play it in the page.")
+    : "No link yet. The website says the stream starts on 25 October.";
+  $("streamPreview").innerHTML = embed ? `<iframe src="${esc(embed)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>` : "";
+  $("streamPreview").hidden = !embed;
+  $("emailCount").textContent = guestEmails(false).length;
+  if (!BODY_EDITED) $("mailBody").value = defaultBody(url);
+}
+async function saveStream(url){
+  const r = await fetch("/api/admin", {method:"POST", headers:{"Content-Type":"application/json","x-admin-key":KEY}, body:JSON.stringify({action:"stream", url})});
+  const j = await r.json().catch(()=>({ok:false,error:"Could not reach the server"}));
+  if (!j.ok) { toast(j.error || "Could not save"); return; }
+  DATA.stream = j.stream; drawLive(); toast(url ? "Stream link saved" : "Stream link removed");
+}
 function drawGuests(){
   const q = $("qGuests").value.trim().toLowerCase();
-  const rows = DATA.rsvps.filter(x => !q || (x.name+" "+(x.phone||"")).toLowerCase().includes(q));
+  const rows = DATA.rsvps.filter(x => !q || (x.name+" "+(x.phone||"")+" "+(x.email||"")).toLowerCase().includes(q));
   const pill = a => a==="In Bida" ? "p-yes" : a==="Watching online" ? "p-online" : "p-no";
-  $("tGuests").innerHTML = rows.length ? rows.map(x=>`<tr><td class="when">${when(x.created_at)}</td><td>${esc(x.name)}</td><td class="num">${esc(x.phone)}</td><td><span class="pill ${pill(x.attending)}">${esc(x.attending)}</span></td><td class="num">${x.attending==="In Bida"?x.guests:""}</td><td class="note">${esc(x.note)}</td></tr>`).join("")
-    : `<tr><td colspan="6" class="empty">No RSVPs yet. They appear here as soon as guests reply on the website.</td></tr>`;
+  $("tGuests").innerHTML = rows.length ? rows.map(x=>`<tr><td class="when">${when(x.created_at)}</td><td>${esc(x.name)}</td><td class="num">${esc(x.phone)}</td><td>${esc(x.email)}</td><td><span class="pill ${pill(x.attending)}">${esc(x.attending)}</span></td><td class="num">${x.attending==="In Bida"?x.guests:""}</td><td class="note">${esc(x.note)}</td></tr>`).join("")
+    : `<tr><td colspan="7" class="empty">No RSVPs yet. They appear here as soon as guests reply on the website.</td></tr>`;
 }
 function drawGifts(){
   const q = $("qGifts").value.trim().toLowerCase();
@@ -178,11 +277,17 @@ $("login").addEventListener("submit", async e => {
 });
 $("logout").onclick = () => { KEY=""; try{sessionStorage.removeItem("gp_admin")}catch(e){} $("pw").value=""; show(false); };
 $("refresh").onclick = async () => { $("refresh").textContent="Loading…"; try{await load();}catch(e){} $("refresh").textContent="Refresh"; };
+$("saveStream").onclick = () => { const v = $("streamUrl").value.trim(); if (!v) { toast("Paste the YouTube link first"); return; } saveStream(v); };
+$("clearStream").onclick = () => { $("streamUrl").value = ""; saveStream(""); };
+$("copyEmails").onclick = () => { const e = guestEmails(false); e.length ? copy(e.join(", "), e.length + " emails") : toast("No emails yet"); };
+$("copyOnline").onclick = () => { const e = guestEmails(true); e.length ? copy(e.join(", "), e.length + " emails") : toast("No online guests with email yet"); };
+$("copyMsg").onclick = () => copy($("mailBody").value, "Message");
+$("mailBody").oninput = () => { BODY_EDITED = true; };
 $("qGuests").oninput = drawGuests; $("qGifts").oninput = drawGifts;
 document.querySelectorAll("[data-csv]").forEach(b => b.onclick = () => csv(b.dataset.csv));
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", x===t));
-  ["guests","gifts","visits"].forEach(n => $("tab-"+n).hidden = n !== t.dataset.tab);
+  ["live","guests","gifts","visits"].forEach(n => $("tab-"+n).hidden = n !== t.dataset.tab);
 });
 if (KEY) load().then(()=>show(true)).catch(()=>show(false));
 </script>

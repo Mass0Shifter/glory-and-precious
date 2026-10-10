@@ -12,7 +12,8 @@ export default async function handler(req, res) {
   if (!name || !attending) return res.status(400).json({ ok: false, error: "Name and attendance are required." });
   const guests = attending === "In Bida" ? Math.min(Math.max(parseInt(b.guests, 10) || 1, 1), 10) : 0;
   try {
-    await saveRecord("rsvps", { name, phone: clip(b.phone, 40), attending, guests, note: clip(b.note, 1000) });
+    const email = clip(b.email, 160);
+    await saveRecord("rsvps", { name, phone: clip(b.phone, 40), email: email && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email.toLowerCase() : null, attending, guests, note: clip(b.note, 1000) });
     res.status(200).json({ ok: true });
   } catch (e) {
     console.error("rsvp", e);

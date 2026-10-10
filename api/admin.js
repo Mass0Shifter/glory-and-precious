@@ -1,6 +1,6 @@
 // Private data for the admin page. Needs ADMIN_PASSWORD (Vercel → Settings → Environment Variables).
 import crypto from "node:crypto";
-import { storeReady, readRecords, listAll, parseVisit } from "./_store.js";
+import { storeReady, readRecords, listAll, parseVisit, saveConfig, readConfig, body } from "./_store.js";
 
 function allowed(req) {
   const want = process.env.ADMIN_PASSWORD || "";
@@ -19,7 +19,15 @@ export default async function handler(req, res) {
   if (!allowed(req)) { await new Promise(r => setTimeout(r, 600)); return res.status(401).json({ ok: false, error: "Wrong password" }); }
   try {
     storeReady();
-    const [rsvps, gifts, visitBlobs] = await Promise.all([readRecords("rsvps/"), readRecords("gifts/"), listAll("visits/")]);
+    if (req.method === "POST") {
+      const b = body(req);
+      if (b.action !== "stream") return res.status(400).json({ ok: false, error: "Unknown action" });
+      const url = String(b.url || "").trim();
+      if (url && !/^https:\/\/[^\s]+$/.test(url)) return res.status(400).json({ ok: false, error: "Please paste a full link starting with https://" });
+      await saveConfig("stream", { url: url.slice(0, 500) });
+      return res.status(200).json({ ok: true, stream: { url } });
+    }
+    const [rsvps, gifts, visitBlobs, stream] = await Promise.all([readRecords("rsvps/"), readRecords("gifts/"), listAll("visits/"), readConfig("stream")]);
     const visits = visitBlobs.map(b => parseVisit(b.pathname));
     const since = Date.now() - 30 * 864e5;
     const byDayMap = {}, srcMap = {};
@@ -28,7 +36,7 @@ export default async function handler(req, res) {
       const s = v.referrer || "Direct / WhatsApp app"; srcMap[s] = (srcMap[s] || 0) + 1;
     }
     res.status(200).json({
-      ok: true, rsvps, gifts,
+      ok: true, rsvps, gifts, stream: { url: stream.url || "", updated_at: stream.updated_at || null },
       visits: {
         visits: visits.length,
         visitors: new Set(visits.map(v => v.session).filter(s => s && s !== "-")).size,
